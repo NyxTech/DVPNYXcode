@@ -46,11 +46,11 @@ export namespace Config {
   function systemManagedConfigDir(): string {
     switch (process.platform) {
       case "darwin":
-        return "/Library/Application Support/opencode"
+        return "/Library/Application Support/dvpnyxcode"
       case "win32":
-        return path.join(process.env.ProgramData || "C:\\ProgramData", "opencode")
+        return path.join(process.env.ProgramData || "C:\\ProgramData", "dvpnyxcode")
       default:
-        return "/etc/opencode"
+        return "/etc/dvpnyxcode"
     }
   }
 

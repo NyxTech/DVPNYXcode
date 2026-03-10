@@ -79,7 +79,7 @@ export namespace Server {
         if (c.req.method === "OPTIONS") return next()
         const password = Flag.OPENCODE_SERVER_PASSWORD
         if (!password) return next()
-        const username = Flag.OPENCODE_SERVER_USERNAME ?? "opencode"
+        const username = Flag.OPENCODE_SERVER_USERNAME ?? "dvpnyxcode"
         return basicAuth({ username, password })(c, next)
       })
       .use(async (c, next) => {
@@ -113,8 +113,8 @@ export namespace Server {
             )
               return input
 
-            // *.opencode.ai (https only, adjust if needed)
-            if (/^https:\/\/([a-z0-9-]+\.)*opencode\.ai$/.test(input)) {
+            // *.dvpnyxcode.dev (https only)
+            if (/^https:\/\/([a-z0-9-]+\.)*dvpnyxcode\.dev$/.test(input)) {
               return input
             }
             if (opts?.cors?.includes(input)) {
@@ -190,8 +190,8 @@ export namespace Server {
       )
       .use(async (c, next) => {
         if (c.req.path === "/log") return next()
-        const workspaceID = c.req.query("workspace") || c.req.header("x-opencode-workspace")
-        const raw = c.req.query("directory") || c.req.header("x-opencode-directory") || process.cwd()
+        const workspaceID = c.req.query("workspace") || c.req.header("x-dvpnyxcode-workspace") || c.req.header("x-opencode-workspace")
+        const raw = c.req.query("directory") || c.req.header("x-dvpnyxcode-directory") || c.req.header("x-opencode-directory") || process.cwd()
         const directory = Filesystem.resolve(
           (() => {
             try {

@@ -217,8 +217,15 @@ export namespace Provider {
 
       // Region precedence: 1) config file, 2) env var, 3) default
       const configRegion = providerConfig?.options?.region
-      const envRegion = Env.get("AWS_REGION")
+      const envRegion = Env.get("AWS_REGION") ?? Env.get("AWS_DEFAULT_REGION")
       const defaultRegion = configRegion ?? envRegion ?? "us-east-1"
+
+      // Failover regions: try these in order if primary region is throttled
+      const failoverRegions: string[] = providerConfig?.options?.failoverRegions ?? [
+        "us-west-2",
+        "us-east-1",
+        "eu-west-1",
+      ]
 
       // Profile: config file takes precedence over env var
       const configProfile = providerConfig?.options?.profile
@@ -227,8 +234,6 @@ export namespace Provider {
 
       const awsAccessKeyId = Env.get("AWS_ACCESS_KEY_ID")
 
-      // TODO: Using process.env directly because Env.set only updates a process.env shallow copy,
-      // until the scope of the Env API is clarified (test only or runtime?)
       const awsBearerToken = iife(() => {
         const envToken = process.env.AWS_BEARER_TOKEN_BEDROCK
         if (envToken) return envToken
@@ -245,45 +250,53 @@ export namespace Provider {
         process.env.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI || process.env.AWS_CONTAINER_CREDENTIALS_FULL_URI,
       )
 
-      if (!profile && !awsAccessKeyId && !awsBearerToken && !awsWebIdentityTokenFile && !containerCreds)
-        return { autoload: false }
+      // SSO session detection (aws sso login)
+      const ssoSession = Boolean(Env.get("AWS_SSO_SESSION") || Env.get("AWS_SSO_ACCOUNT_ID"))
 
+      // EC2/ECS instance metadata detection
+      const imds = Boolean(process.env.AWS_EC2_METADATA_DISABLED !== "true" && !awsAccessKeyId && !profile)
+
+      // Autoload: aggressively detect ANY valid credential source
+      // This makes Bedrock the primary/default provider for DVPNYXcode
+      const hasCreds =
+        profile || awsAccessKeyId || awsBearerToken || awsWebIdentityTokenFile || containerCreds || ssoSession || imds
+
+      if (!hasCreds) {
+        log.info("bedrock: no credentials detected, attempting default credential chain")
+      }
+
+      // Always autoload — use the full credential chain as fallback
+      // The AWS SDK will try: env vars, SSO, profile, IMDS, ECS task role, etc.
       const providerOptions: AmazonBedrockProviderSettings = {
         region: defaultRegion,
       }
 
-      // Only use credential chain if no bearer token exists
-      // Bearer token takes precedence over credential chain (profiles, access keys, IAM roles, web identity tokens)
       if (!awsBearerToken) {
-        // Build credential provider options (only pass profile if specified)
         const credentialProviderOptions = profile ? { profile } : {}
-
         providerOptions.credentialProvider = fromNodeProviderChain(credentialProviderOptions)
       }
 
-      // Add custom endpoint if specified (endpoint takes precedence over baseURL)
+      // Custom endpoint (VPC endpoints, PrivateLink, etc.)
       const endpoint = providerConfig?.options?.endpoint ?? providerConfig?.options?.baseURL
       if (endpoint) {
         providerOptions.baseURL = endpoint
       }
+
+      // Retry configuration for Bedrock throttling
+      const maxRetries = providerConfig?.options?.maxRetries ?? 3
+      const baseDelay = providerConfig?.options?.retryBaseDelay ?? 1000
 
       return {
         autoload: true,
         options: providerOptions,
         async getModel(sdk: any, modelID: string, options?: Record<string, any>) {
           // Skip region prefixing if model already has a cross-region inference profile prefix
-          // Models from models.dev may already include prefixes like us., eu., global., etc.
           const crossRegionPrefixes = ["global.", "us.", "eu.", "jp.", "apac.", "au."]
           if (crossRegionPrefixes.some((prefix) => modelID.startsWith(prefix))) {
             return sdk.languageModel(modelID)
           }
 
-          // Region resolution precedence (highest to lowest):
-          // 1. options.region from opencode.json provider config
-          // 2. defaultRegion from AWS_REGION environment variable
-          // 3. Default "us-east-1" (baked into defaultRegion)
           const region = options?.region ?? defaultRegion
-
           let regionPrefix = region.split("-")[0]
 
           switch (regionPrefix) {
@@ -331,7 +344,6 @@ export namespace Provider {
                 regionPrefix = "au"
                 modelID = `${regionPrefix}.${modelID}`
               } else if (isTokyoRegion) {
-                // Tokyo region uses jp. prefix for cross-region inference
                 const modelRequiresPrefix = ["claude", "nova-lite", "nova-micro", "nova-pro"].some((m) =>
                   modelID.includes(m),
                 )
@@ -340,7 +352,6 @@ export namespace Provider {
                   modelID = `${regionPrefix}.${modelID}`
                 }
               } else {
-                // Other APAC regions use apac. prefix
                 const modelRequiresPrefix = ["claude", "nova-lite", "nova-micro", "nova-pro"].some((m) =>
                   modelID.includes(m),
                 )
@@ -362,8 +373,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://opencode.ai/",
-            "X-Title": "opencode",
+            "HTTP-Referer": "https://dvpnyxcode.dev/",
+            "X-Title": "dvpnyxcode",
           },
         },
       }
@@ -373,8 +384,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "http-referer": "https://opencode.ai/",
-            "x-title": "opencode",
+            "http-referer": "https://dvpnyxcode.dev/",
+            "x-title": "dvpnyxcode",
           },
         },
       }
@@ -459,8 +470,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://opencode.ai/",
-            "X-Title": "opencode",
+            "HTTP-Referer": "https://dvpnyxcode.dev/",
+            "X-Title": "dvpnyxcode",
           },
         },
       }
@@ -479,7 +490,7 @@ export namespace Provider {
       const providerConfig = config.provider?.["gitlab"]
 
       const aiGatewayHeaders = {
-        "User-Agent": `opencode/${Installation.VERSION} gitlab-ai-provider/${GITLAB_PROVIDER_VERSION} (${os.platform()} ${os.release()}; ${os.arch()})`,
+        "User-Agent": `dvpnyxcode/${Installation.VERSION} gitlab-ai-provider/${GITLAB_PROVIDER_VERSION} (${os.platform()} ${os.release()}; ${os.arch()})`,
         "anthropic-beta": "context-1m-2025-08-07",
         ...(providerConfig?.options?.aiGatewayHeaders || {}),
       }
@@ -549,7 +560,7 @@ export namespace Provider {
       if (!apiToken) {
         throw new Error(
           "CLOUDFLARE_API_TOKEN (or CF_AIG_TOKEN) is required for Cloudflare AI Gateway. " +
-            "Set it via environment variable or run `opencode auth cloudflare-ai-gateway`.",
+            "Set it via environment variable or run `dvpnyxcode auth cloudflare-ai-gateway`."
         )
       }
 
@@ -595,7 +606,7 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "X-Cerebras-3rd-Party-Integration": "opencode",
+            "X-Cerebras-3rd-Party-Integration": "dvpnyxcode",
           },
         },
       }
@@ -605,8 +616,8 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://opencode.ai/",
-            "X-Title": "opencode",
+            "HTTP-Referer": "https://dvpnyxcode.dev/",
+            "X-Title": "dvpnyxcode",
           },
         },
       }

@@ -17,12 +17,16 @@ export namespace SystemPrompt {
   }
 
   export function provider(model: Provider.Model) {
-    if (model.api.id.includes("gpt-5")) return [PROMPT_CODEX]
-    if (model.api.id.includes("gpt-") || model.api.id.includes("o1") || model.api.id.includes("o3"))
+    const id = model.api.id
+    if (id.includes("gpt-5")) return [PROMPT_CODEX]
+    if (id.includes("gpt-") || id.includes("o1") || id.includes("o3"))
       return [PROMPT_BEAST]
-    if (model.api.id.includes("gemini-")) return [PROMPT_GEMINI]
-    if (model.api.id.includes("claude")) return [PROMPT_ANTHROPIC]
-    if (model.api.id.toLowerCase().includes("trinity")) return [PROMPT_TRINITY]
+    if (id.includes("gemini-")) return [PROMPT_GEMINI]
+    // Bedrock Claude models include "anthropic.claude" or just "claude"
+    if (id.includes("claude") || id.includes("anthropic.claude")) return [PROMPT_ANTHROPIC]
+    // Bedrock Nova models get the Anthropic-style prompt (best general-purpose)
+    if (id.includes("nova-") || id.includes("amazon.nova")) return [PROMPT_ANTHROPIC]
+    if (id.toLowerCase().includes("trinity")) return [PROMPT_TRINITY]
     return [PROMPT_ANTHROPIC_WITHOUT_TODO]
   }
 
@@ -30,8 +34,8 @@ export namespace SystemPrompt {
     const project = Instance.project
     return [
       [
-        `You are powered by the model named ${model.api.id}. The exact model ID is ${model.providerID}/${model.api.id}`,
-        `Here is some useful information about the environment you are running in:`,
+        `You are DVPNYXcode, powered by the model named ${model.api.id}. The exact model ID is ${model.providerID}/${model.api.id}`,
+        `Here is some useful information about the environment you are running in:`
         `<env>`,
         `  Working directory: ${Instance.directory}`,
         `  Is directory a git repo: ${project.vcs === "git" ? "yes" : "no"}`,
