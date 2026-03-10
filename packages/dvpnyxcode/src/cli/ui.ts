@@ -43,24 +43,10 @@ export namespace UI {
   export function logo(pad?: string) {
     const result: string[] = []
     const reset = "\x1b[0m"
+    const color = "\x1b[38;2;104;46;102m" // Hex #682E66
     
-    // Vertical gradient using 256-color ANSI for a nice blue-to-purple transition
-    const gradient = [
-      "\x1b[38;5;39m",  // Deep Sky Blue
-      "\x1b[38;5;39m",
-      "\x1b[38;5;75m",  // Steel Blue
-      "\x1b[38;5;75m",
-      "\x1b[38;5;111m", // Cornflower Blue
-      "\x1b[38;5;147m", // Light Slate Blue
-      "\x1b[38;5;183m", // Plum
-      "\x1b[38;5;177m", // Medium Purple
-      "\x1b[38;5;171m", // Orchid
-      "\x1b[38;5;165m", // Magenta
-    ]
-    
-    glyphs.forEach((line, i) => {
+    glyphs.forEach((line) => {
       if (pad) result.push(pad)
-      const color = gradient[i % gradient.length]
       result.push(color, line, reset, EOL)
     })
     return result.join("").trimEnd()
