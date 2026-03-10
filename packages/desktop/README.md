@@ -1,6 +1,6 @@
-# OpenCode Desktop
+# DVPNYXcode Desktop
 
-Native OpenCode desktop app, built with Tauri v2.
+Native DVPNYXcode desktop app, built with Tauri v2.
 
 ## Prerequisites
 

@@ -52,3 +52,15 @@ export abstract class NamedError extends Error {
     }),
   )
 }
+
+export interface ResolveMessage extends Error {
+  readonly code?: string
+  readonly specifier?: string
+  readonly referrer?: string
+  readonly position?: number
+  readonly importKind?: string
+}
+
+export const ResolveMessage = (globalThis as any).ResolveMessage as {
+  new (...args: any[]): ResolveMessage
+}

@@ -1,7 +1,7 @@
 <h1 align="center">DVPNYXcode</h1>
 <p align="center">AI-powered coding agent — Bedrock-first, lean, and customizable.</p>
 <p align="center">
-  Fork of <a href="https://github.com/anomalyco/opencode">OpenCode</a>, stripped and optimized for AWS Bedrock.
+  Fork of <a href="https://github.com/anomalyco/dvpnyxcode">DVPNYXcode</a>, stripped and optimized for AWS Bedrock.
 </p>
 
 ---
@@ -70,7 +70,7 @@ Switch with `Tab`:
 
 | Package | Purpose |
 |---|---|
-| `packages/opencode` | Core engine: agents, providers, tools, server, storage |
+| `packages/dvpnyxcode` | Core engine: agents, providers, tools, server, storage |
 | `packages/app` | Web UI (SolidJS) |
 | `packages/desktop` | Native desktop app (Tauri) |
 | `packages/ui` | Shared component library |
@@ -80,12 +80,12 @@ Switch with `Tab`:
 ### Building
 
 ```bash
-./packages/opencode/script/build.ts --single
-./packages/opencode/dist/dvpnyxcode-<platform>/bin/dvpnyxcode
+./packages/dvpnyxcode/script/build.ts --single
+./packages/dvpnyxcode/dist/dvpnyxcode-<platform>/bin/dvpnyxcode
 ```
 
 ### License
 
 MIT — see [LICENSE](./LICENSE).
 
-Based on [OpenCode](https://github.com/anomalyco/opencode) by Anomaly.
+Based on [DVPNYXcode](https://github.com/anomalyco/dvpnyxcode) by Anomaly.

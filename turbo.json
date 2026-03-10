@@ -8,7 +8,7 @@
       "dependsOn": [],
       "outputs": ["dist/**"]
     },
-    "opencode#test": {
+    "dvpnyxcode#test": {
       "dependsOn": ["^build"],
       "outputs": []
     }

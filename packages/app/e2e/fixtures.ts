@@ -92,9 +92,9 @@ async function seedStorage(page: Page, input: { directory: string; extra?: strin
   await seedProjects(page, input)
   await page.addInitScript(() => {
     localStorage.setItem(
-      "opencode.global.dat:model",
+      "dvpnyxcode.global.dat:model",
       JSON.stringify({
-        recent: [{ providerID: "opencode", modelID: "big-pickle" }],
+        recent: [{ providerID: "dvpnyxcode", modelID: "big-pickle" }],
         user: [],
         variant: {},
       }),

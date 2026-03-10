@@ -53,16 +53,16 @@ impl MainWindow {
             app,
             decorations,
         )
-        .title("OpenCode")
+        .title("DVPNYXcode")
         .disable_drag_drop_handler()
         .zoom_hotkeys_enabled(false)
         .visible(true)
         .maximized(true)
         .initialization_script(format!(
             r#"
-            window.__OPENCODE__ ??= {{}};
-            window.__OPENCODE__.updaterEnabled = {UPDATER_ENABLED};
-            window.__OPENCODE__.wsl = {wsl_enabled};
+            window.__DVPNYXCODE__ ??= {{}};
+            window.__DVPNYXCODE__.updaterEnabled = {UPDATER_ENABLED};
+            window.__DVPNYXCODE__.wsl = {wsl_enabled};
           "#
         ));
 

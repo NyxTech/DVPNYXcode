@@ -1,9 +1,9 @@
 import { Component, createMemo, createSignal, Show } from "solid-js"
 import { useSync } from "@/context/sync"
 import { useSDK } from "@/context/sdk"
-import { Dialog } from "@opencode-ai/ui/dialog"
-import { List } from "@opencode-ai/ui/list"
-import { Switch } from "@opencode-ai/ui/switch"
+import { Dialog } from "@dvpnyxcode/ui/dialog"
+import { List } from "@dvpnyxcode/ui/list"
+import { Switch } from "@dvpnyxcode/ui/switch"
 import { useLanguage } from "@/context/language"
 
 const statusLabels = {

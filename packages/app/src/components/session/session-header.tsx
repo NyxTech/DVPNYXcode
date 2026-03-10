@@ -1,15 +1,15 @@
-import { AppIcon } from "@opencode-ai/ui/app-icon"
-import { Button } from "@opencode-ai/ui/button"
-import { DropdownMenu } from "@opencode-ai/ui/dropdown-menu"
-import { Icon } from "@opencode-ai/ui/icon"
-import { IconButton } from "@opencode-ai/ui/icon-button"
-import { Keybind } from "@opencode-ai/ui/keybind"
-import { Popover } from "@opencode-ai/ui/popover"
-import { Spinner } from "@opencode-ai/ui/spinner"
-import { TextField } from "@opencode-ai/ui/text-field"
-import { showToast } from "@opencode-ai/ui/toast"
-import { Tooltip, TooltipKeybind } from "@opencode-ai/ui/tooltip"
-import { getFilename } from "@opencode-ai/util/path"
+import { AppIcon } from "@dvpnyxcode/ui/app-icon"
+import { Button } from "@dvpnyxcode/ui/button"
+import { DropdownMenu } from "@dvpnyxcode/ui/dropdown-menu"
+import { Icon } from "@dvpnyxcode/ui/icon"
+import { IconButton } from "@dvpnyxcode/ui/icon-button"
+import { Keybind } from "@dvpnyxcode/ui/keybind"
+import { Popover } from "@dvpnyxcode/ui/popover"
+import { Spinner } from "@dvpnyxcode/ui/spinner"
+import { TextField } from "@dvpnyxcode/ui/text-field"
+import { showToast } from "@dvpnyxcode/ui/toast"
+import { Tooltip, TooltipKeybind } from "@dvpnyxcode/ui/tooltip"
+import { getFilename } from "@dvpnyxcode/util/path"
 import { useParams } from "@solidjs/router"
 import { createEffect, createMemo, For, onCleanup, Show } from "solid-js"
 import { createStore } from "solid-js/store"
@@ -356,8 +356,8 @@ export function SessionHeader() {
     platform,
   })
 
-  const centerMount = createMemo(() => document.getElementById("opencode-titlebar-center"))
-  const rightMount = createMemo(() => document.getElementById("opencode-titlebar-right"))
+  const centerMount = createMemo(() => document.getElementById("dvpnyxcode-titlebar-center"))
+  const rightMount = createMemo(() => document.getElementById("dvpnyxcode-titlebar-right"))
 
   return (
     <>

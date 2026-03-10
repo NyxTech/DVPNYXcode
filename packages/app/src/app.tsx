@@ -1,11 +1,11 @@
 import "@/index.css"
-import { File } from "@opencode-ai/ui/file"
-import { I18nProvider } from "@opencode-ai/ui/context"
-import { DialogProvider } from "@opencode-ai/ui/context/dialog"
-import { FileComponentProvider } from "@opencode-ai/ui/context/file"
-import { MarkedProvider } from "@opencode-ai/ui/context/marked"
-import { Font } from "@opencode-ai/ui/font"
-import { ThemeProvider } from "@opencode-ai/ui/theme"
+import { File } from "@dvpnyxcode/ui/file"
+import { I18nProvider } from "@dvpnyxcode/ui/context"
+import { DialogProvider } from "@dvpnyxcode/ui/context/dialog"
+import { FileComponentProvider } from "@dvpnyxcode/ui/context/file"
+import { MarkedProvider } from "@dvpnyxcode/ui/context/marked"
+import { Font } from "@dvpnyxcode/ui/font"
+import { ThemeProvider } from "@dvpnyxcode/ui/theme"
 import { MetaProvider } from "@solidjs/meta"
 import { BaseRouterProps, Navigate, Route, Router } from "@solidjs/router"
 import { Component, ErrorBoundary, type JSX, lazy, type ParentProps, Show, Suspense } from "solid-js"
@@ -57,7 +57,7 @@ function UiI18nBridge(props: ParentProps) {
 
 declare global {
   interface Window {
-    __OPENCODE__?: {
+    __DVPNYXCODE__?: {
       updaterEnabled?: boolean
       deepLinks?: string[]
       wsl?: boolean
