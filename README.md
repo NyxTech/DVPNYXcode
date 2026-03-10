@@ -1,70 +1,50 @@
-<h1 align="center">DVPNYXcode</h1>
-<p align="center">AI-powered coding agent — Bedrock-first, lean, and customizable.</p>
+<h1 align="center">██████████   █████   █████ ███████████  ██████   █████ █████ █████ █████ █████<br>░░███░░░░███ ░░███   ░░███ ░░███░░░░░███░░██████ ░░███ ░░███ ░░███ ░░███ ░░███ <br> ░███   ░░███ ░███    ░███  ░███    ░███ ░███░███ ░███  ░░███ ███   ░░███ ███  <br> ░███    ░███ ░███    ░███  ░██████████  ░███░░███░███   ░░█████     ░░█████   <br> ░███    ░███ ░░███   ███   ░███░░░░░░   ░███ ░░██████    ░░███       ███░███  <br> ░███    ███   ░░░█████░    ░███         ░███  ░░█████     ░███      ███ ░░███ <br> ██████████      ░░███      █████        █████  ░░█████    █████    █████ █████<br>░░░░░░░░░░        ░░░      ░░░░░        ░░░░░    ░░░░░    ░░░░░    ░░░░░ ░░░░░ <br>                        ██████╗ ██████╗ ██████╗ ███████╗                       <br>                       ██╔════╝██╔═══██╗██╔══██╗██╔════╝                       <br>                       ██║     ██║   ██║██║  ██║█████╗                         <br>                       ██║     ██║   ██║██║  ██║██╔══╝                         <br>                       ╚██████╗╚██████╔╝██████╔╝███████╗                       <br>                        ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝</h1>
+
+<p align="center"><b>DVPNYXcode</b> — AI-powered coding agent. Bedrock-first, lean, and highly intuitive.</p>
+
 <p align="center">
-  Fork of <a href="https://github.com/anomalyco/dvpnyxcode">DVPNYXcode</a>, stripped and optimized for AWS Bedrock.
+  Rebranded fork of <a href="https://github.com/anomalyco/opencode">OpenCode</a>, stripped and optimized for <b>AWS Bedrock</b>.
 </p>
 
 ---
 
 ### What is DVPNYXcode?
 
-DVPNYXcode is a customized AI coding agent built for teams that use **AWS Bedrock** as their primary AI provider.
+DVPNYXcode is a customized AI coding agent built for high-performance development teams that use **AWS Bedrock** as their primary AI engine. It combines the power of Bedrock with a smooth Terminal (TUI) and Web interface.
 
-- **Bedrock-first** — auto-detects AWS credentials (SSO, IAM roles, profiles, ECS task roles, IMDS), always-on
-- **Multi-region failover** — configurable failover regions for throttling resilience
-- **Cross-region inference** — automatic region prefix handling for Claude, Nova, and other Bedrock models
-- **Lean** — stripped of unnecessary packages (marketing site, storybook, slack, enterprise, etc.)
-- **Client/Server architecture** — TUI, Web UI, and Desktop (Tauri) frontends
-- **Provider-agnostic** — while Bedrock is primary, still supports Anthropic, OpenAI, Google, and 20+ providers
+- **Bedrock-First Experience** — Native support for Amazon Bedrock with automatic credential detection.
+- **Account & Cost Tracking** — Always see which AWS Account and Profile are generating costs directly in the UI.
+- **Interactive AWS Setup** — Simple command-line flow to configure your AWS region and profile.
+- **Multi-region Failover** — Smart failover to secondary regions if your primary region is throttled.
+- **Lean & Fast** — Optimized architecture using Bun and Turborepo for a lightweight developer experience.
+- **Versatile UI** — Use it via TUI (Terminal), Web interface, or Desktop (Tauri) app.
 
 ### Quick Start
 
 ```bash
 bun install
-bun dev                          # TUI (default)
-bun dev serve                    # headless API server
-bun dev /path/to/your/project    # TUI in specific directory
+bun run dev                          # Start the TUI (default)
+bun run dev web                      # Start the Web interface
+bun run dev --help                   # See all available commands
 ```
 
-### AWS Bedrock Configuration
+### Amazon Bedrock Setup
 
-DVPNYXcode auto-detects AWS credentials. No config needed if you have any of:
+To configure or switch your AWS account/region, simply run:
 
-- `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` env vars
+```bash
+dvpnyxcode auth login --provider amazon-bedrock
+```
+
+The agent will walk you through selecting your profile and region, then verify your identity using AWS STS.
+
+### AWS Credential Detection
+
+DVPNYXcode auto-detects AWS credentials. No manual config is needed if you have any of the following active:
 - `AWS_PROFILE` (named profile from `~/.aws/credentials`)
-- `AWS_SSO_SESSION` (SSO login via `aws sso login`)
-- `AWS_WEB_IDENTITY_TOKEN_FILE` (OIDC / Kubernetes)
+- `AWS_SSO_SESSION` (via `aws sso login`)
+- `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` env vars
 - ECS task role / EC2 instance metadata (IMDS)
-- Bearer token via `AWS_BEARER_TOKEN_BEDROCK`
-
-#### Optional Config
-
-Create `dvpnyxcode.json` in your project root:
-
-```json
-{
-  "provider": {
-    "amazon-bedrock": {
-      "options": {
-        "region": "us-west-2",
-        "profile": "my-aws-profile",
-        "failoverRegions": ["us-east-1", "eu-west-1"],
-        "maxRetries": 3,
-        "retryBaseDelay": 1000,
-        "endpoint": "https://vpce-xxx.bedrock-runtime.us-west-2.vpce.amazonaws.com"
-      }
-    }
-  }
-}
-```
-
-### Agents
-
-Switch with `Tab`:
-
-- **build** — full-access agent for development work
-- **plan** — read-only agent for analysis and exploration
-- **general** — subagent for complex searches (invoke via `@general`)
 
 ### Architecture
 
@@ -77,15 +57,8 @@ Switch with `Tab`:
 | `packages/plugin` | Plugin system |
 | `packages/util` | Shared utilities |
 
-### Building
-
-```bash
-./packages/dvpnyxcode/script/build.ts --single
-./packages/dvpnyxcode/dist/dvpnyxcode-<platform>/bin/dvpnyxcode
-```
-
 ### License
 
 MIT — see [LICENSE](./LICENSE).
 
-Based on [DVPNYXcode](https://github.com/anomalyco/dvpnyxcode) by Anomaly.
+Based on [OpenCode](https://github.com/anomalyco/opencode) by Anomaly.
