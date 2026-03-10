@@ -43,11 +43,30 @@ export namespace UI {
   export function logo(pad?: string) {
     const result: string[] = []
     const reset = "\x1b[0m"
-    const cyan = "\x1b[96m"
     
-    glyphs.forEach((line) => {
+    // Vertical gradient from Blue to Purple (using 256-color palette)
+    // Starting with deep blue (27) through bright blue (33, 39) to purple (93, 129, 165)
+    const gradient = [
+      "\x1b[38;5;27m",  // Deep Blue
+      "\x1b[38;5;33m",  // Blue
+      "\x1b[38;5;39m",  // Sky Blue
+      "\x1b[38;5;75m",  // Light Blue
+      "\x1b[38;5;111m", // Very Light Blue
+      "\x1b[38;5;147m", // Pale Purple
+      "\x1b[38;5;183m", // Light Purple
+      "\x1b[38;5;177m", // Purple
+      "\x1b[38;5;171m", // Medium Purple
+      "\x1b[38;5;165m", // Deep Purple
+      "\x1b[38;5;129m", // Dark Purple
+      "\x1b[38;5;93m",  // Violet
+      "\x1b[38;5;57m",  // Indigo
+      "\x1b[38;5;21m",  // Navy (for the bottom edges)
+    ]
+    
+    glyphs.forEach((line, i) => {
       if (pad) result.push(pad)
-      result.push(cyan, line, reset, EOL)
+      const color = gradient[i % gradient.length]
+      result.push(color, line, reset, EOL)
     })
     return result.join("").trimEnd()
   }
