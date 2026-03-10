@@ -53,8 +53,12 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
     if (!last) return
     const total =
       last.tokens.input + last.tokens.output + last.tokens.reasoning + last.tokens.cache.read + last.tokens.cache.write
-    const model = sync.data.provider.find((x) => x.id === last.providerID)?.models[last.modelID]
+    const provider = sync.data.provider.find((x) => x.id === last.providerID)
+    const model = provider?.models[last.modelID]
     return {
+      provider: provider?.name,
+      accountId: provider?.accountId,
+      profile: provider?.profile,
       tokens: total.toLocaleString(),
       percentage: model?.limit.context ? Math.round((total / model.limit.context) * 100) : null,
     }
@@ -102,8 +106,24 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
               <text fg={theme.text}>
                 <b>Context</b>
               </text>
-              <text fg={theme.textMuted}>{context()?.tokens ?? 0} tokens</text>
-              <text fg={theme.textMuted}>{context()?.percentage ?? 0}% used</text>
+              <Show when={context()}>
+                {(ctx) => (
+                  <>
+                    <text fg={theme.textMuted}>
+                      {ctx().provider}
+                      <Show when={ctx().accountId || ctx().profile}>
+                        {" "}
+                        <span style={{ fg: theme.text }}>
+                          ({ctx().profile ? `${ctx().profile}:` : ""}
+                          {ctx().accountId})
+                        </span>
+                      </Show>
+                    </text>
+                    <text fg={theme.textMuted}>{ctx().tokens} tokens</text>
+                    <text fg={theme.textMuted}>{ctx().percentage ?? 0}% used</text>
+                  </>
+                )}
+              </Show>
               <text fg={theme.textMuted}>{cost()} spent</text>
             </box>
             <Show when={mcpEntries().length > 0}>
@@ -308,7 +328,7 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
             <span style={{ fg: theme.text }}>{directory().split("/").at(-1)}</span>
           </text>
           <text fg={theme.textMuted}>
-            <span style={{ fg: theme.success }}>•</span> <b>Open</b>
+            <span style={{ fg: theme.success }}>•</span> <b>DVPNYX</b>
             <span style={{ fg: theme.text }}>
               <b>Code</b>
             </span>{" "}

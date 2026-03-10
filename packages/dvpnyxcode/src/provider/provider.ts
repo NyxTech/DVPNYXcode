@@ -42,6 +42,7 @@ import { createPerplexity } from "@ai-sdk/perplexity"
 import { createVercel } from "@ai-sdk/vercel"
 import { createGitLab, VERSION as GITLAB_PROVIDER_VERSION } from "@gitlab/gitlab-ai-provider"
 import { fromNodeProviderChain } from "@aws-sdk/credential-providers"
+import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts"
 import { GoogleAuth } from "google-auth-library"
 import { ProviderTransform } from "./transform"
 import { Installation } from "../installation"
@@ -271,9 +272,23 @@ export namespace Provider {
         region: defaultRegion,
       }
 
+      const credentialProviderOptions = profile ? { profile } : {}
+      const credentialProvider = fromNodeProviderChain(credentialProviderOptions)
+
       if (!awsBearerToken) {
-        const credentialProviderOptions = profile ? { profile } : {}
-        providerOptions.credentialProvider = fromNodeProviderChain(credentialProviderOptions)
+        providerOptions.credentialProvider = credentialProvider
+      }
+
+      let accountId: string | undefined
+      try {
+        const sts = new STSClient({
+          region: defaultRegion,
+          credentials: credentialProvider,
+        })
+        const identity = await sts.send(new GetCallerIdentityCommand({}))
+        accountId = identity.Account
+      } catch (e) {
+        log.warn("bedrock: failed to fetch account identity", { error: e })
       }
 
       // Custom endpoint (VPC endpoints, PrivateLink, etc.)
@@ -289,6 +304,8 @@ export namespace Provider {
       return {
         autoload: true,
         options: providerOptions,
+        accountId,
+        profile,
         async getModel(sdk: any, modelID: string, options?: Record<string, any>) {
           // Skip region prefixing if model already has a cross-region inference profile prefix
           const crossRegionPrefixes = ["global.", "us.", "eu.", "jp.", "apac.", "au."]
@@ -702,6 +719,8 @@ export namespace Provider {
       source: z.enum(["env", "config", "custom", "api"]),
       env: z.string().array(),
       key: z.string().optional(),
+      accountId: z.string().optional(),
+      profile: z.string().optional(),
       options: z.record(z.string(), z.any()),
       models: z.record(z.string(), Model),
     })
@@ -1005,7 +1024,18 @@ export namespace Provider {
       if (result && (result.autoload || providers[providerID])) {
         if (result.getModel) modelLoaders[providerID] = result.getModel
         const opts = result.options ?? {}
-        const patch: Partial<Info> = providers[providerID] ? { options: opts } : { source: "custom", options: opts }
+        const patch: Partial<Info> = providers[providerID]
+          ? {
+              options: opts,
+              accountId: result.accountId,
+              profile: result.profile,
+            }
+          : {
+              source: "custom",
+              options: opts,
+              accountId: result.accountId,
+              profile: result.profile,
+            }
         mergeProvider(providerID, patch)
       }
     }
@@ -1311,6 +1341,33 @@ export namespace Provider {
       [(model) => (model.id.includes("latest") ? 0 : 1), "asc"],
       [(model) => model.id, "desc"],
     )
+  }
+
+  export async function verifyBedrock() {
+    const s = await state()
+    const bedrock = s.providers["amazon-bedrock"]
+    if (!bedrock) return false
+
+    // If we already have an accountId, we're likely good
+    if (bedrock.accountId) return true
+
+    // Check if we can get it now
+    try {
+      const { STSClient, GetCallerIdentityCommand } = await import("@aws-sdk/client-sts")
+      const { fromNodeProviderChain } = await import("@aws-sdk/credential-providers")
+
+      const profile = bedrock.profile
+      const region = bedrock.options?.region ?? "us-east-1"
+      const credentialProvider = fromNodeProviderChain(profile ? { profile } : {})
+      const sts = new STSClient({
+        region,
+        credentials: credentialProvider,
+      })
+      const identity = await sts.send(new GetCallerIdentityCommand({}))
+      return !!identity.Account
+    } catch {
+      return false
+    }
   }
 
   export async function defaultModel() {

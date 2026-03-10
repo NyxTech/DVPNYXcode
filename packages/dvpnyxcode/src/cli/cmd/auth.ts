@@ -422,13 +422,60 @@ export const AuthLoginCommand = cmd({
         }
 
         if (provider === "amazon-bedrock") {
-          prompts.log.info(
-            "Amazon Bedrock authentication priority:\n" +
-              "  1. Bearer token (AWS_BEARER_TOKEN_BEDROCK or /connect)\n" +
-              "  2. AWS credential chain (profile, access keys, IAM roles, EKS IRSA)\n\n" +
-              "Configure via dvpnyxcode.json options (profile, region, endpoint) or\n" +
-              "AWS environment variables (AWS_PROFILE, AWS_REGION, AWS_ACCESS_KEY_ID, AWS_WEB_IDENTITY_TOKEN_FILE).",
-          )
+          prompts.log.info("Setting up Amazon Bedrock...")
+
+          const awsProfile = await prompts.text({
+            message: "AWS Profile (optional, press enter for default)",
+            placeholder: "default",
+          })
+          if (prompts.isCancel(awsProfile)) throw new UI.CancelledError()
+
+          const awsRegion = await prompts.text({
+            message: "AWS Region",
+            placeholder: "us-east-1",
+            validate: (v) => (v ? undefined : "Region is required"),
+          })
+          if (prompts.isCancel(awsRegion)) throw new UI.CancelledError()
+
+          const spinner = prompts.spinner()
+          spinner.start("Verifying credentials...")
+
+          try {
+            const { STSClient, GetCallerIdentityCommand } = await import("@aws-sdk/client-sts")
+            const { fromNodeProviderChain } = await import("@aws-sdk/credential-providers")
+
+            const credentialProvider = fromNodeProviderChain(awsProfile ? { profile: awsProfile } : {})
+            const sts = new STSClient({
+              region: awsRegion,
+              credentials: credentialProvider,
+            })
+            const identity = await sts.send(new GetCallerIdentityCommand({}))
+
+            spinner.stop(`Authenticated as account ${identity.Account}`)
+
+            // Save to global config
+            await Config.updateGlobal({
+              provider: {
+                "amazon-bedrock": {
+                  options: {
+                    region: awsRegion,
+                    profile: awsProfile || undefined,
+                  },
+                },
+              },
+            })
+
+            prompts.log.success("Amazon Bedrock configured successfully!")
+            prompts.outro("Done")
+            return
+          } catch (e: any) {
+            spinner.stop("Verification failed", 1)
+            prompts.log.error(e.message)
+            const retry = await prompts.confirm({
+              message: "Continue anyway?",
+            })
+            if (!retry || prompts.isCancel(retry)) throw new UI.CancelledError()
+          }
         }
 
         if (provider === "dvpnyxcode") {

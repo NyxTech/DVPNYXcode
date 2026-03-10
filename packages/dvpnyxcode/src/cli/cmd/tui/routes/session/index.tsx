@@ -491,6 +491,32 @@ export function Session() {
       },
     },
     {
+      title: "Switch AWS Account / Region",
+      value: "bedrock.setup",
+      category: "Provider",
+      slash: {
+        name: "bedrock-setup",
+      },
+      onSelect: (dialog) => {
+        // We can't easily run the interactive prompts within the TUI yet,
+        // but we can show a message or use a dialog if we have one.
+        // For now, let's use a simple confirm to tell them how to do it.
+        dialog.replace(() => (
+          <box paddingLeft={1} paddingRight={1} paddingTop={1} paddingBottom={1}>
+            <text fg={theme.text}>
+              To switch AWS accounts or regions, please exit DVPNYXcode and run:
+            </text>
+            <text fg={theme.primary}>
+              dvpnyxcode auth login --provider amazon-bedrock
+            </text>
+            <box paddingTop={1}>
+              <text fg={theme.textMuted}>Press any key to close</text>
+            </box>
+          </box>
+        ))
+      },
+    },
+    {
       title: "Undo previous message",
       value: "session.undo",
       keybind: "messages_undo",
