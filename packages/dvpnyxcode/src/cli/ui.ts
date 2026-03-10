@@ -44,23 +44,18 @@ export namespace UI {
     const result: string[] = []
     const reset = "\x1b[0m"
     
-    // Vertical gradient from Blue to Purple (using 256-color palette)
-    // Starting with deep blue (27) through bright blue (33, 39) to purple (93, 129, 165)
+    // Vertical gradient using 256-color ANSI for a nice blue-to-purple transition
     const gradient = [
-      "\x1b[38;5;27m",  // Deep Blue
-      "\x1b[38;5;33m",  // Blue
-      "\x1b[38;5;39m",  // Sky Blue
-      "\x1b[38;5;75m",  // Light Blue
-      "\x1b[38;5;111m", // Very Light Blue
-      "\x1b[38;5;147m", // Pale Purple
-      "\x1b[38;5;183m", // Light Purple
-      "\x1b[38;5;177m", // Purple
-      "\x1b[38;5;171m", // Medium Purple
-      "\x1b[38;5;165m", // Deep Purple
-      "\x1b[38;5;129m", // Dark Purple
-      "\x1b[38;5;93m",  // Violet
-      "\x1b[38;5;57m",  // Indigo
-      "\x1b[38;5;21m",  // Navy (for the bottom edges)
+      "\x1b[38;5;39m",  // Deep Sky Blue
+      "\x1b[38;5;39m",
+      "\x1b[38;5;75m",  // Steel Blue
+      "\x1b[38;5;75m",
+      "\x1b[38;5;111m", // Cornflower Blue
+      "\x1b[38;5;147m", // Light Slate Blue
+      "\x1b[38;5;183m", // Plum
+      "\x1b[38;5;177m", // Medium Purple
+      "\x1b[38;5;171m", // Orchid
+      "\x1b[38;5;165m", // Magenta
     ]
     
     glyphs.forEach((line, i) => {
