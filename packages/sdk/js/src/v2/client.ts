@@ -2,8 +2,8 @@ export * from "./gen/types.gen.js"
 
 import { createClient } from "./gen/client/client.gen.js"
 import { type Config } from "./gen/client/types.gen.js"
-import { DVPNYXcodeClient } from "./gen/sdk.gen.js"
-export { type Config as DVPNYXcodeClientConfig, DVPNYXcodeClient }
+import { DvpnyXcodeClient } from "./gen/sdk.gen.js"
+export { type Config as DVPNYXcodeClientConfig, DvpnyXcodeClient as DVPNYXcodeClient }
 
 export function createDVPNYXcodeClient(config?: Config & { directory?: string; experimental_workspaceID?: string }) {
   if (!config?.fetch) {
@@ -35,5 +35,5 @@ export function createDVPNYXcodeClient(config?: Config & { directory?: string; e
   }
 
   const client = createClient(config)
-  return new DVPNYXcodeClient({ client })
+  return new DvpnyXcodeClient({ client })
 }

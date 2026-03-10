@@ -218,7 +218,7 @@ class HeyApiRegistry<T> {
   get(key?: string): T {
     const instance = this.instances.get(key ?? this.defaultKey)
     if (!instance) {
-      throw new Error(`No SDK client found. Create one with "new DVPNYXcodeClient()" to fix this error.`)
+      throw new Error(`No SDK client found. Create one with "new DvpnyXcodeClient()" to fix this error.`)
     }
     return instance
   }
@@ -3890,12 +3890,12 @@ export class Event extends HeyApiClient {
   }
 }
 
-export class DVPNYXcodeClient extends HeyApiClient {
-  public static readonly __registry = new HeyApiRegistry<DVPNYXcodeClient>()
+export class DvpnyXcodeClient extends HeyApiClient {
+  public static readonly __registry = new HeyApiRegistry<DvpnyXcodeClient>()
 
   constructor(args?: { client?: Client; key?: string }) {
     super(args)
-    DVPNYXcodeClient.__registry.set(this, args?.key)
+    DvpnyXcodeClient.__registry.set(this, args?.key)
   }
 
   private _global?: Global

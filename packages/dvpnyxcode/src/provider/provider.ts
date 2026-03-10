@@ -116,6 +116,8 @@ export namespace Provider {
     autoload: boolean
     getModel?: CustomModelLoader
     options?: Record<string, any>
+    accountId?: string
+    profile?: string
   }>
 
   const CUSTOM_LOADERS: Record<string, CustomLoader> = {

@@ -10987,6 +10987,12 @@
           "key": {
             "type": "string"
           },
+          "accountId": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
           "options": {
             "type": "object",
             "propertyNames": {

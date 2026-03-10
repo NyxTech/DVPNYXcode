@@ -1613,6 +1613,8 @@ export type Provider = {
   source: "env" | "config" | "custom" | "api"
   env: Array<string>
   key?: string
+  accountId?: string
+  profile?: string
   options: {
     [key: string]: unknown
   }
